@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Jcreation Site Setup
  * Description: Creates the Jcreation starter pages, Flatsome UX Blocks, menu, categories, and sample SEO content without custom CSS.
- * Version: 1.2.0
+ * Version: 1.3.0
  * Author: Codihaus
  */
 
@@ -17,11 +17,21 @@ if ( class_exists( 'JCreation_Site_Setup', false ) ) {
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-jcreation-ux-blocks.php';
 
 final class JCreation_Site_Setup {
-	const VERSION = '1.2.0';
+	const VERSION = '1.3.0';
 
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_admin_page' ) );
 		add_action( 'admin_post_jcreation_run_site_setup', array( __CLASS__, 'handle_manual_setup' ) );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_assets' ) );
+	}
+
+	public static function enqueue_assets() {
+		wp_enqueue_style(
+			'jcreation-source-home',
+			plugins_url( 'assets/css/jcreation-source-home.css', __FILE__ ),
+			array(),
+			self::VERSION
+		);
 	}
 
 	public static function activate() {

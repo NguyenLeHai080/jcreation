@@ -2,7 +2,7 @@
 /**
  * Plugin Name: Jcreation Site Setup
  * Description: Creates the Jcreation starter pages, Flatsome UX Blocks, menu, categories, and sample SEO content without custom CSS.
- * Version: 1.3.0
+ * Version: 1.3.1
  * Author: Codihaus
  */
 
@@ -17,7 +17,7 @@ if ( class_exists( 'JCreation_Site_Setup', false ) ) {
 require_once plugin_dir_path( __FILE__ ) . 'includes/class-jcreation-ux-blocks.php';
 
 final class JCreation_Site_Setup {
-	const VERSION = '1.3.0';
+	const VERSION = '1.3.1';
 
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_admin_page' ) );
@@ -338,6 +338,8 @@ final class JCreation_Site_Setup {
 	}
 
 	private static function apply_theme_settings( $pages ) {
+		self::sync_site_urls();
+
 		if ( ! empty( $pages['trang-chu'] ) ) {
 			update_option( 'show_on_front', 'page' );
 			update_option( 'page_on_front', $pages['trang-chu'] );
@@ -348,6 +350,42 @@ final class JCreation_Site_Setup {
 		}
 
 		set_theme_mod( 'color_primary', '#2697d8' );
+	}
+
+	private static function sync_site_urls() {
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			return;
+		}
+
+		if ( ! apply_filters( 'jcreation_sync_site_urls', true ) ) {
+			return;
+		}
+
+		if ( empty( $_SERVER['HTTP_HOST'] ) ) {
+			return;
+		}
+
+		$host = sanitize_text_field( wp_unslash( $_SERVER['HTTP_HOST'] ) );
+		$host = preg_replace( '/[^A-Za-z0-9\\.\\-\\:]/', '', $host );
+
+		if ( ! $host ) {
+			return;
+		}
+
+		$scheme = 'http';
+		if ( is_ssl() ) {
+			$scheme = 'https';
+		} elseif ( ! empty( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) ) {
+			$forwarded_proto = strtolower( sanitize_text_field( wp_unslash( $_SERVER['HTTP_X_FORWARDED_PROTO'] ) ) );
+			$scheme          = 'https' === $forwarded_proto ? 'https' : 'http';
+		}
+
+		$url = esc_url_raw( $scheme . '://' . $host );
+
+		if ( $url ) {
+			update_option( 'home', $url );
+			update_option( 'siteurl', $url );
+		}
 	}
 
 	private static function import_source_assets() {

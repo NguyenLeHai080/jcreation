@@ -11,6 +11,7 @@ Plugin nay tao cau truc ban dau cho website Jcreation bang Flatsome UX Builder:
 - Mau primary cua Flatsome theo xanh logo tam thoi `#2697d8`.
 - Tu phien ban 1.2.0, Home duoc tach thanh cac Flatsome UX Blocks co the mo va sua trong UX Builder.
 - Tu phien ban 1.3.0, plugin enqueue CSS scoped rieng de match gan hon giao dien goc va MU loader tu chay setup tren request dau tien sau deploy, khong can doi admin vao WP Admin.
+- Tu phien ban 1.3.1, setup tu dong cap nhat option `home` va `siteurl` theo domain cua request hien tai neu `WP_HOME`/`WP_SITEURL` khong duoc hard-code trong config.
 
 ## Cach dung
 

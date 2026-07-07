@@ -1,0 +1,28 @@
+# === Sensitive: chứa mật khẩu DB, KHÔNG đẩy lên repo public ===
+code/wp-config.php
+
+# === WordPress uploads / cache / backup (không cần version) ===
+code/wp-content/uploads/
+code/wp-content/cache/
+code/wp-content/upgrade/
+code/wp-content/upgrade-temp-backup/
+code/wp-content/backup*/
+code/wp-content/blogs.dir/
+code/wp-content/w3tc-config/
+code/wp-content/advanced-cache.php
+code/wp-content/wp-cache-config.php
+
+# === Logs & temp ===
+*.log
+code/wp-content/debug.log
+
+# === OS / editor ===
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# === Dependencies (nếu có build tool trong theme) ===
+node_modules/
+vendor/

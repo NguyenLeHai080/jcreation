@@ -127,7 +127,7 @@ final class JCreation_UX_Blocks {
 
 	private static function top_links() {
 		return <<<'HTML'
-[section label="Top links" padding="8px" bg_color="rgb(43, 151, 216)" dark="true"]
+[section label="Top links" class="jcreation-top-links" padding="8px" bg_color="rgb(43, 151, 216)" dark="true"]
 	[row h_align="right" style="collapse"]
 		[col span="12" span__sm="12" align="right"]
 			<p><a href="/">Home</a>&nbsp;&nbsp;&nbsp;<a href="http://gwx.bizmeka.com/LoginC.aspx?compid=jcreation">Group Ware</a></p>
@@ -142,8 +142,8 @@ HTML;
 
 		foreach ( array( 'hero_1', 'hero_2', 'hero_3', 'hero_4', 'hero_5' ) as $key ) {
 			$slides .= sprintf(
-				'[ux_banner label="Main visual" height="640px" bg="%1$s" bg_overlay="rgba(0, 0, 0, 0.48)" parallax="0"]
-					[text_box width="42" width__sm="86" position_x="73" position_y="50" text_align="center" text_color="light" animate="fadeInRight"]
+				'[ux_banner label="Main visual" class="jcreation-hero-banner" height="640px" bg="%1$s" bg_overlay="rgba(0, 0, 0, 0.58)" parallax="0" bg_pos="50%% 50%%"]
+					[text_box class="jcreation-hero-copy" width="42" width__sm="86" position_x="73" position_y="50" text_align="center" text_color="light" animate="fadeInRight"]
 						<h3>Leader of Core Technology</h3>
 						<h1><strong><em>JIG &amp; CREATION</em></strong></h1>
 						<p>We are Leader of Car JIG &amp; CREATION Parts.<br>If you need high technology of Jig &amp; Creation, Join us.</p>
@@ -153,15 +153,15 @@ HTML;
 			);
 		}
 
-		return '[ux_slider label="Jcreation main slider" type="fade" nav_style="simple" nav_color="light" bullets="false" auto_slide="true" timer="4500"]' . $slides . '[/ux_slider]';
+		return '[ux_slider label="Jcreation main slider" class="jcreation-main-slider" type="fade" nav_style="simple" nav_color="light" bullets="false" auto_slide="true" timer="4500"]' . $slides . '[/ux_slider]';
 	}
 
 	private static function quick_links() {
 		return <<<'HTML'
-[section label="Catalogue Video Portfolio" padding="50px"]
-	[row label="Quick link cards" style="large" col_style="divided"]
+[section label="Catalogue Video Portfolio" class="jcreation-quick-links" padding="50px"]
+	[row label="Quick link cards" class="jcreation-quick-links-row" style="large" col_style="divided"]
 		[col span="4" span__sm="12"]
-			[ux_image_box img="jcreation_asset:catalogue" image_height="42%" link="/catalog/" text_align="left"]
+			[ux_image_box class="jcreation-quick-card" img="jcreation_asset:catalogue" image_height="42%" image_hover="zoom" link="/catalog/" text_align="left"]
 				<h3>カタログ</h3>
 				<p><span>Catalogue</span></p>
 				<p>(株) J&amp;Cに関するカタログ情報です。</p>
@@ -169,7 +169,7 @@ HTML;
 			[/ux_image_box]
 		[/col]
 		[col span="4" span__sm="12"]
-			[ux_image_box img="jcreation_asset:video" image_height="42%" link="/video/" text_align="left"]
+			[ux_image_box class="jcreation-quick-card" img="jcreation_asset:video" image_height="42%" image_hover="zoom" link="/video/" text_align="left"]
 				<h3>広報動画</h3>
 				<p><span>Video</span></p>
 				<p>(株) J&amp;Cの会社紹介及び自動車車体溶接用ジグの生産設備に関する動画情報です。</p>
@@ -177,7 +177,7 @@ HTML;
 			[/ux_image_box]
 		[/col]
 		[col span="4" span__sm="12"]
-			[ux_image_box img="jcreation_asset:portfolio" image_height="42%" link="/san-pham/" text_align="left"]
+			[ux_image_box class="jcreation-quick-card" img="jcreation_asset:portfolio" image_height="42%" image_hover="zoom" link="/san-pham/" text_align="left"]
 				<h3>生産製品ポートフォリオ</h3>
 				<p><span>Product Portfolio</span></p>
 				<p>(株) J&amp;Cの生産製品の写真です。</p>
@@ -191,8 +191,8 @@ HTML;
 
 	private static function products() {
 		return <<<'HTML'
-[section label="Products" padding="30px"]
-	[row style="large" v_align="middle"]
+[section label="Products" class="jcreation-products" padding="30px"]
+	[row class="jcreation-products-row" style="large" v_align="middle"]
 		[col span="4" span__sm="12"]
 			<h2>製品紹介</h2>
 			<h3><em>Products</em></h3>
@@ -203,7 +203,7 @@ HTML;
 			</ul>
 		[/col]
 		[col span="4" span__sm="12"]
-			[ux_image_box img="jcreation_asset:product_1" style="shade" image_height="124%" text_pos="middle" text_color="light" link="/san-pham/"]
+			[ux_image_box class="jcreation-product-overlay" img="jcreation_asset:product_1" style="shade" image_height="124%" image_hover="zoom" text_pos="middle" text_color="light" link="/san-pham/"]
 				<h2>生産製品</h2>
 				<h3><em>Products</em></h3>
 			[/ux_image_box]
@@ -218,15 +218,15 @@ HTML;
 
 	private static function community() {
 		return <<<'HTML'
-[section label="Notice and R&D" padding="30px 30px 60px 30px"]
-	[row style="large"]
+[section label="Notice and R&D" class="jcreation-community" padding="30px 30px 60px 30px"]
+	[row class="jcreation-community-row" style="large"]
 		[col span="6" span__sm="12"]
-			[ux_image_box img="jcreation_asset:notice" style="shade" image_height="52%" text_pos="middle" text_color="light" link="/tin-tuc/"]
+			[ux_image_box class="jcreation-bottom-banner" img="jcreation_asset:notice" style="shade" image_height="52%" image_hover="zoom" text_pos="middle" text_color="light" link="/tin-tuc/"]
 				<h2>お知らせ事項</h2>
 			[/ux_image_box]
 		[/col]
 		[col span="6" span__sm="12"]
-			[ux_image_box img="jcreation_asset:rnd" style="shade" image_height="52%" text_pos="middle" text_color="light" link="/ve-chung-toi/"]
+			[ux_image_box class="jcreation-bottom-banner" img="jcreation_asset:rnd" style="shade" image_height="52%" image_hover="zoom" text_pos="middle" text_color="light" link="/ve-chung-toi/"]
 				<h2>R&amp;D 技術研究所</h2>
 			[/ux_image_box]
 		[/col]
@@ -237,8 +237,8 @@ HTML;
 
 	private static function footer_info() {
 		return <<<'HTML'
-[section label="Footer information" padding="35px" bg_color="rgb(31, 31, 31)" dark="true"]
-	[row v_align="middle"]
+[section label="Footer information" class="jcreation-footer-info" padding="35px" bg_color="rgb(31, 31, 31)" dark="true"]
+	[row class="jcreation-footer-row" v_align="middle"]
 		[col span="6" span__sm="12" align="center"]
 			[ux_image img="jcreation_asset:footer_logo" image_size="original" width="48"]
 		[/col]

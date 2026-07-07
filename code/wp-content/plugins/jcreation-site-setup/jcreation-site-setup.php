@@ -10,6 +10,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+if ( class_exists( 'JCreation_Site_Setup', false ) ) {
+	return;
+}
+
 final class JCreation_Site_Setup {
 	const VERSION = '1.0.0';
 

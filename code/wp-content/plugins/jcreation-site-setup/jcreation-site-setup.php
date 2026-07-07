@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name: Jcreation Site Setup
- * Description: Creates the Jcreation starter pages, menu, categories, and sample SEO content without custom CSS or layout shortcodes.
- * Version: 1.0.0
+ * Description: Creates the Jcreation starter pages, Flatsome UX Blocks, menu, categories, and sample SEO content without custom CSS.
+ * Version: 1.2.0
  * Author: Codihaus
  */
 
@@ -14,8 +14,10 @@ if ( class_exists( 'JCreation_Site_Setup', false ) ) {
 	return;
 }
 
+require_once plugin_dir_path( __FILE__ ) . 'includes/class-jcreation-ux-blocks.php';
+
 final class JCreation_Site_Setup {
-	const VERSION = '1.1.0';
+	const VERSION = '1.2.0';
 
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_admin_page' ) );
@@ -50,8 +52,8 @@ final class JCreation_Site_Setup {
 					<p>Jcreation site structure has been created or updated.</p>
 				</div>
 			<?php endif; ?>
-			<p>This setup creates the required pages, menu, categories, sample posts, and front-page settings. It does not add custom CSS and does not create layout shortcodes.</p>
-			<p>After running this setup, open each page with Flatsome UX Builder and refine the visual layout by dragging sections/elements according to <code>docs/jcreation-ux-builder-build-checklist.md</code>.</p>
+			<p>This setup creates the required pages, Flatsome UX Blocks, menu, categories, sample posts, and front-page settings. It does not add custom CSS.</p>
+			<p>After running this setup, open Home with Flatsome UX Builder. The homepage is split into editable UX Blocks for hero, quick links, products, community, and footer information.</p>
 			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 				<?php wp_nonce_field( 'jcreation_run_site_setup' ); ?>
 				<input type="hidden" name="action" value="jcreation_run_site_setup">
@@ -114,14 +116,15 @@ final class JCreation_Site_Setup {
 	}
 
 	private static function create_pages() {
-		$assets = self::import_source_assets();
+		$assets           = self::import_source_assets();
+		$home_block_slugs = class_exists( 'JCreation_UX_Blocks', false ) ? JCreation_UX_Blocks::create( $assets ) : array();
 
 		$definitions = array(
 			'trang-chu'           => array(
 				'title'       => 'Trang chủ',
 				'menu_order'  => 1,
 				'description' => 'Jcreation cung cấp giải pháp JIG & CREATION, sản phẩm sản xuất, catalogue, video, portfolio và R&D.',
-				'content'     => self::home_content( $assets ),
+				'content'     => $home_block_slugs ? JCreation_UX_Blocks::home_page_content( $home_block_slugs ) : self::home_content( $assets ),
 			),
 			've-chung-toi'        => array(
 				'title'       => 'Về chúng tôi',

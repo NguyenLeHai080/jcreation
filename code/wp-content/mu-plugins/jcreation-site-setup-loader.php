@@ -16,13 +16,7 @@ if ( file_exists( $jcreation_setup_plugin ) && ! class_exists( 'JCreation_Site_S
 	require_once $jcreation_setup_plugin;
 }
 
-add_action(
-	'admin_init',
-	function () {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
+function jcreation_maybe_run_site_setup() {
 		if ( ! class_exists( 'JCreation_Site_Setup', false ) ) {
 			return;
 		}
@@ -31,6 +25,14 @@ add_action(
 			return;
 		}
 
+		if ( get_transient( 'jcreation_site_setup_running' ) ) {
+			return;
+		}
+
+		set_transient( 'jcreation_site_setup_running', 1, 5 * MINUTE_IN_SECONDS );
 		JCreation_Site_Setup::run();
-	}
-);
+		delete_transient( 'jcreation_site_setup_running' );
+}
+
+add_action( 'admin_init', 'jcreation_maybe_run_site_setup' );
+add_action( 'wp_loaded', 'jcreation_maybe_run_site_setup' );

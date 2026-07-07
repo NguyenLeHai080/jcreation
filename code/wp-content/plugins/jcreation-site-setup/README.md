@@ -8,6 +8,7 @@ Plugin nay tao cau truc ban dau cho website Jcreation:
 - Mot so bai viet mau de lam khung SEO.
 - Homepage va Posts page trong Settings > Reading.
 - Mau primary cua Flatsome theo xanh logo tam thoi `#2697d8`.
+- Tu phien ban 1.1.0, setup import cac anh goc tu `https://jcreation.co.kr/ja/home/` vao Media Library va cap nhat Home theo cau truc gan trang goc: main visual, Catalogue, Video, Product Portfolio, Products, Notice, R&D, footer info.
 
 ## Cach dung
 

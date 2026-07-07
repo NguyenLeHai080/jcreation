@@ -15,7 +15,7 @@ if ( class_exists( 'JCreation_Site_Setup', false ) ) {
 }
 
 final class JCreation_Site_Setup {
-	const VERSION = '1.0.0';
+	const VERSION = '1.1.0';
 
 	public static function init() {
 		add_action( 'admin_menu', array( __CLASS__, 'register_admin_page' ) );
@@ -114,12 +114,14 @@ final class JCreation_Site_Setup {
 	}
 
 	private static function create_pages() {
+		$assets = self::import_source_assets();
+
 		$definitions = array(
 			'trang-chu'           => array(
 				'title'       => 'Trang chủ',
 				'menu_order'  => 1,
-				'description' => 'Jcreation Việt Nam cung cấp giải pháp jig, automation và cơ khí chính xác cho sản xuất công nghiệp.',
-				'content'     => self::home_content(),
+				'description' => 'Jcreation cung cấp giải pháp JIG & CREATION, sản phẩm sản xuất, catalogue, video, portfolio và R&D.',
+				'content'     => self::home_content( $assets ),
 			),
 			've-chung-toi'        => array(
 				'title'       => 'Về chúng tôi',
@@ -131,7 +133,7 @@ final class JCreation_Site_Setup {
 				'title'       => 'Sản phẩm',
 				'menu_order'  => 3,
 				'description' => 'Danh mục sản phẩm và giải pháp jig, fixture, automation, cơ khí chính xác của Jcreation.',
-				'content'     => self::products_content(),
+				'content'     => self::products_content( $assets ),
 			),
 			'doi-tac'             => array(
 				'title'       => 'Đối tác thương mại',
@@ -222,8 +224,16 @@ final class JCreation_Site_Setup {
 			}
 		}
 
+		$menu_items = array(
+			'trang-chu'          => 'Home',
+			've-chung-toi'       => '会社紹介',
+			'san-pham'           => '製品紹介',
+			'doi-tac'            => '主要取引先',
+			'dich-vu-khach-hang' => 'コミュニティ',
+		);
+
 		$order = 1;
-		foreach ( array( 'trang-chu', 've-chung-toi', 'san-pham', 'doi-tac', 'dich-vu-khach-hang' ) as $slug ) {
+		foreach ( $menu_items as $slug => $label ) {
 			if ( empty( $pages[ $slug ] ) ) {
 				continue;
 			}
@@ -235,6 +245,7 @@ final class JCreation_Site_Setup {
 					'menu-item-object-id' => $pages[ $slug ],
 					'menu-item-object'    => 'page',
 					'menu-item-type'      => 'post_type',
+					'menu-item-title'     => $label,
 					'menu-item-status'    => 'publish',
 					'menu-item-position'  => $order,
 				)
@@ -326,59 +337,176 @@ final class JCreation_Site_Setup {
 		set_theme_mod( 'color_primary', '#2697d8' );
 	}
 
-	private static function home_content() {
-		return <<<'HTML'
-<section aria-label="Hero">
-	<h1>Jcreation Việt Nam</h1>
-	<p>Giải pháp Jig, Automation và cơ khí chính xác cho sản xuất công nghiệp.</p>
-	<p><a href="/san-pham/">Xem sản phẩm</a> <a href="/dich-vu-khach-hang/">Liên hệ tư vấn</a></p>
+	private static function import_source_assets() {
+		$assets = array(
+			'hero_1'      => 'https://jcreation.co.kr/wp-content/uploads/2017/04/jnc_mainslider1.jpg',
+			'hero_2'      => 'https://jcreation.co.kr/wp-content/uploads/2017/04/jnc_mainslider2.jpg',
+			'hero_3'      => 'https://jcreation.co.kr/wp-content/uploads/2017/04/jnc_mainslider3.jpg',
+			'hero_4'      => 'https://jcreation.co.kr/wp-content/uploads/2017/04/jnc_mainslider4.jpg',
+			'hero_5'      => 'https://jcreation.co.kr/wp-content/uploads/2017/04/jnc_mainslider5.jpg',
+			'catalogue'   => 'https://jcreation.co.kr/wp-content/uploads/2017/02/catalogue.jpg',
+			'video'       => 'https://jcreation.co.kr/wp-content/uploads/2017/09/video_hover.jpg',
+			'portfolio'   => 'https://jcreation.co.kr/wp-content/uploads/2017/02/popol2.jpg',
+			'product_1'   => 'https://jcreation.co.kr/wp-content/uploads/2017/02/product1-1.jpg',
+			'product_2'   => 'https://jcreation.co.kr/wp-content/uploads/2017/02/product2-1.jpg',
+			'notice'      => 'https://jcreation.co.kr/wp-content/uploads/2017/09/notice_hover.jpg',
+			'rnd'         => 'https://jcreation.co.kr/wp-content/uploads/2017/09/RND_hover.jpg',
+			'footer_logo' => 'https://jcreation.co.kr/wp-content/uploads/2017/08/footer_logo-1.png',
+		);
+
+		$imported = array();
+
+		foreach ( $assets as $key => $url ) {
+			$imported[ $key ] = self::import_source_asset( $key, $url );
+		}
+
+		return $imported;
+	}
+
+	private static function import_source_asset( $key, $url ) {
+		$existing = get_posts(
+			array(
+				'post_type'      => 'attachment',
+				'post_status'    => 'inherit',
+				'posts_per_page' => 1,
+				'meta_key'       => '_jcreation_source_asset_key',
+				'meta_value'     => $key,
+				'fields'         => 'ids',
+			)
+		);
+
+		if ( ! empty( $existing ) ) {
+			return wp_get_attachment_url( (int) $existing[0] );
+		}
+
+		if ( ! function_exists( 'download_url' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+
+		if ( ! function_exists( 'media_handle_sideload' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/media.php';
+			require_once ABSPATH . 'wp-admin/includes/image.php';
+		}
+
+		$tmp = download_url( $url, 30 );
+		if ( is_wp_error( $tmp ) ) {
+			return $url;
+		}
+
+		$file_array = array(
+			'name'     => basename( wp_parse_url( $url, PHP_URL_PATH ) ),
+			'tmp_name' => $tmp,
+		);
+
+		$attachment_id = media_handle_sideload( $file_array, 0, 'Jcreation source asset: ' . $key );
+
+		if ( is_wp_error( $attachment_id ) ) {
+			@unlink( $tmp );
+			return $url;
+		}
+
+		update_post_meta( $attachment_id, '_jcreation_source_asset_key', $key );
+		update_post_meta( $attachment_id, '_jcreation_source_asset_url', $url );
+
+		return wp_get_attachment_url( $attachment_id );
+	}
+
+	private static function asset_url( $assets, $key ) {
+		return isset( $assets[ $key ] ) && $assets[ $key ] ? $assets[ $key ] : '';
+	}
+
+	private static function home_content( $assets ) {
+		$hero_images = array_filter(
+			array(
+				self::asset_url( $assets, 'hero_1' ),
+				self::asset_url( $assets, 'hero_2' ),
+				self::asset_url( $assets, 'hero_3' ),
+				self::asset_url( $assets, 'hero_4' ),
+				self::asset_url( $assets, 'hero_5' ),
+			)
+		);
+
+		$hero_html = '';
+		foreach ( $hero_images as $index => $image_url ) {
+			$hero_html .= sprintf(
+				'<figure><img src="%s" alt="%s"></figure>',
+				esc_url( $image_url ),
+				esc_attr( 'Jcreation main slider ' . ( $index + 1 ) )
+			);
+		}
+
+		return sprintf(
+			<<<'HTML'
+<section aria-label="Home top links">
+	<p><a href="/">Home</a> <a href="http://gwx.bizmeka.com/LoginC.aspx?compid=jcreation">Group Ware</a></p>
 </section>
 
-<section aria-label="Giới thiệu ngắn">
-	<h2>Về Jcreation</h2>
-	<p>Jcreation cung cấp giải pháp thiết kế và sản xuất jig, thiết bị tự động hóa và các cụm chi tiết phục vụ dây chuyền sản xuất. Chúng tôi tập trung vào độ chính xác, tính ổn định và khả năng đồng hành lâu dài cùng khách hàng.</p>
-	<p><a href="/ve-chung-toi/">Tìm hiểu thêm</a></p>
+<section aria-label="Jcreation main visual">
+	%1$s
+	<h1>Leader of Core Technology<br>JIG &amp; CREATION</h1>
+	<p>We are Leader of Car JIG &amp; CREATION Parts. If you need high technology of Jig &amp; Creation, Join us.</p>
 </section>
 
-<section aria-label="Con số nổi bật">
-	<h2>Con số nổi bật</h2>
+<section aria-label="Quick links">
+	<h2>カタログ</h2>
+	<h3>Catalogue</h3>
+	<figure><img src="%2$s" alt="Catalogue"></figure>
+	<p>(株) J&amp;Cに関するカタログ情報です。</p>
+	<p><a href="/catalog/">もっと見る</a></p>
+
+	<h2>広報動画</h2>
+	<h3>Video</h3>
+	<figure><img src="%3$s" alt="Video"></figure>
+	<p>(株) J&amp;Cの会社紹介及び自動車車体溶接用ジグの生産設備に関する動画情報です。</p>
+	<p><a href="/video/">もっと見る</a></p>
+
+	<h2>生産製品ポートフォリオ</h2>
+	<h3>Product Portfolio</h3>
+	<figure><img src="%4$s" alt="Product Portfolio"></figure>
+	<p>(株) J&amp;Cの生産製品の写真です。</p>
+	<p><a href="/san-pham/">もっと見る</a></p>
+</section>
+
+<section aria-label="Products">
+	<h2>製品紹介</h2>
+	<h3>Products</h3>
+	<p>(株) J&amp;Cは統合システム能力はもちろん、品質最優先、納期、価格競争力で顧客が満足できるよう最善の努力を尽くしています。</p>
 	<ul>
-		<li><strong>5+</strong> năm kinh nghiệm</li>
-		<li><strong>100+</strong> đối tác</li>
-		<li><strong>1000+</strong> khách hàng</li>
-		<li><strong>500+</strong> dự án</li>
+		<li><a href="/san-pham/">生産製品</a></li>
+		<li><a href="/san-pham/">生産工程</a></li>
 	</ul>
+	<figure><img src="%5$s" alt="Products"></figure>
+	<figure><img src="%6$s" alt="Production process"></figure>
 </section>
 
-<section aria-label="Sản phẩm nổi bật">
-	<h2>Sản phẩm nổi bật</h2>
-	<p>Các nhóm giải pháp chính của Jcreation phục vụ nhà máy sản xuất, dây chuyền lắp ráp và hệ thống kiểm tra.</p>
-	<ul>
-		<li>Jig và Fixture</li>
-		<li>Thiết bị tự động hóa</li>
-		<li>Cụm chi tiết cơ khí chính xác</li>
-		<li>Hệ thống kiểm tra và lắp ráp</li>
-	</ul>
-	<p><a href="/san-pham/">Xem toàn bộ sản phẩm</a></p>
+<section aria-label="Community">
+	<h2>お知らせ事項</h2>
+	<figure><img src="%7$s" alt="Notice"></figure>
+	<p><a href="/tin-tuc/">もっと見る</a></p>
+
+	<h2>R&amp;D 技術研究所</h2>
+	<figure><img src="%8$s" alt="R and D"></figure>
+	<p><a href="/ve-chung-toi/">もっと見る</a></p>
 </section>
 
-<section aria-label="Đối tác thương mại">
-	<h2>Đối tác thương mại</h2>
-	<p>Khu vực logo đối tác sẽ được cập nhật bằng Flatsome Logo Slider hoặc Image Gallery sau khi có logo gốc từ khách hàng.</p>
-	<p><a href="/doi-tac/">Xem đối tác</a></p>
+<section aria-label="Footer information">
+	<figure><img src="%9$s" alt="J&C CO., LTD."></figure>
+	<p>商号: (株) J &amp; C　代表理事: 裵于培</p>
+	<p>住所: 韓国 京畿道 華城市 南陽面 善洞山丹2道81</p>
+	<p>Tel. +82-31-366-9426 Fax. +82-31-355-9094</p>
+	<p>Copyright © J&amp;C All Rights Reserved</p>
 </section>
-
-<section aria-label="Tin tức">
-	<h2>Tin tức mới nhất</h2>
-	<p>Khu vực này sẽ hiển thị các bài viết thuộc chuyên mục Tin tức bằng element Blog Posts trong Flatsome UX Builder.</p>
-</section>
-
-<section aria-label="Tư vấn">
-	<h2>Cần tư vấn giải pháp sản xuất?</h2>
-	<p>Gửi yêu cầu để đội ngũ Jcreation liên hệ và đề xuất giải pháp phù hợp.</p>
-	<p><a href="/dich-vu-khach-hang/">Gửi yêu cầu</a></p>
-</section>
-HTML;
+HTML,
+			$hero_html,
+			esc_url( self::asset_url( $assets, 'catalogue' ) ),
+			esc_url( self::asset_url( $assets, 'video' ) ),
+			esc_url( self::asset_url( $assets, 'portfolio' ) ),
+			esc_url( self::asset_url( $assets, 'product_1' ) ),
+			esc_url( self::asset_url( $assets, 'product_2' ) ),
+			esc_url( self::asset_url( $assets, 'notice' ) ),
+			esc_url( self::asset_url( $assets, 'rnd' ) ),
+			esc_url( self::asset_url( $assets, 'footer_logo' ) )
+		);
 	}
 
 	private static function about_content() {
@@ -420,45 +548,49 @@ HTML;
 HTML;
 	}
 
-	private static function products_content() {
-		return <<<'HTML'
+	private static function products_content( $assets ) {
+		return sprintf(
+			<<<'HTML'
 <section aria-label="Page banner">
-	<h1>Sản phẩm</h1>
-	<p>Giải pháp jig, automation và cơ khí chính xác cho sản xuất.</p>
+	<h1>製品紹介</h1>
+	<p>Products</p>
 </section>
 
 <section aria-label="Tổng quan sản phẩm">
-	<h2>Năng lực sản phẩm</h2>
-	<p>Jcreation phát triển các giải pháp phục vụ dây chuyền sản xuất, từ jig/fixture, thiết bị tự động hóa đến cụm chi tiết cơ khí chính xác và hệ thống kiểm tra.</p>
+	<h2>JIG &amp; CREATION Products</h2>
+	<p>(株) J&amp;Cは統合システム能力はもちろん、品質最優先、納期、価格競争力で顧客が満足できるよう最善の努力を尽くしています。</p>
+	<figure><img src="%1$s" alt="Jcreation products"></figure>
+	<figure><img src="%2$s" alt="Jcreation production process"></figure>
 </section>
 
 <section aria-label="Danh mục sản phẩm">
-	<h2>Danh mục sản phẩm</h2>
-	<h3>Jig &amp; Fixture</h3>
-	<p>Thiết kế và sản xuất jig/fixture theo yêu cầu lắp ráp, kiểm tra và định vị.</p>
-	<h3>Automation Equipment</h3>
-	<p>Thiết bị và cụm tự động hóa giúp tối ưu năng suất và độ ổn định.</p>
-	<h3>Precision Parts</h3>
-	<p>Các cụm chi tiết cơ khí chính xác phục vụ hệ thống sản xuất.</p>
-	<h3>Inspection &amp; Assembly System</h3>
-	<p>Hệ thống hỗ trợ kiểm tra, lắp ráp và quản lý chất lượng.</p>
+	<h2>Product Categories</h2>
+	<ul>
+		<li>生産製品 / Production products</li>
+		<li>生産工程 / Production process</li>
+		<li>Jig &amp; Fixture</li>
+		<li>Automation Equipment</li>
+	</ul>
 </section>
 
 <section aria-label="Quy trình làm việc">
-	<h2>Quy trình làm việc</h2>
+	<h2>Process</h2>
 	<ol>
-		<li>Tiếp nhận yêu cầu.</li>
-		<li>Thiết kế giải pháp.</li>
-		<li>Sản xuất và lắp ráp.</li>
-		<li>Kiểm tra và bàn giao.</li>
+		<li>Requirement review</li>
+		<li>Design and engineering</li>
+		<li>Manufacturing and assembly</li>
+		<li>Inspection and delivery</li>
 	</ol>
 </section>
 
 <section aria-label="Liên hệ sản phẩm">
-	<h2>Cần tư vấn sản phẩm?</h2>
-	<p><a href="/dich-vu-khach-hang/">Liên hệ Jcreation</a></p>
+	<h2>Customer Consultation</h2>
+	<p><a href="/dich-vu-khach-hang/">Contact Jcreation</a></p>
 </section>
-HTML;
+HTML,
+			esc_url( self::asset_url( $assets, 'product_1' ) ),
+			esc_url( self::asset_url( $assets, 'product_2' ) )
+		);
 	}
 
 	private static function partners_content() {
